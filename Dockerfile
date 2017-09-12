@@ -3,15 +3,19 @@ FROM 2dotstwice/php71-cli
 MAINTAINER Kristof Coomans "kristof@2dotstwice.be"
 ENV REFRESHED_AT "2017-02-16 08:08:00"
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y --fix-missing -q install mysql-client curl wget sed
-
-RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
-RUN composer global require drush/drush:8.*
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -y --fix-missing --no-install-recommends -q install \
+        mysql-client \
+        curl \
+        wget \
+        sed && \
+    curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && \
+    composer global require drush/drush:8.* && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN touch ~/.profile
 
-env PATH ~/.composer/vendor/bin:$PATH
+ENV PATH ~/.composer/vendor/bin:$PATH
 
 # ensure console_table is installed
 RUN ~/.composer/vendor/bin/drush --debug
