@@ -7,6 +7,7 @@ if [ ! -e ./core ]; then
 fi
 
 drush -y updb;
+drush -y entity-updates;
 
 # Config sync
 if [ -e ./core ]; then
