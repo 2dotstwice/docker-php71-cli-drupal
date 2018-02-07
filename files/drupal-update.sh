@@ -7,7 +7,6 @@ if [ ! -e ./core ]; then
   drush fra --yes || true;
 
   drush -y updb;
-  drush -y entity-updates;
 
    drush -y cc all;
 else
