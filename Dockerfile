@@ -1,7 +1,11 @@
 FROM 2dotstwice/php71-cli
 
 MAINTAINER Kristof Coomans "kristof@2dotstwice.be"
-ENV REFRESHED_AT "2017-02-16 08:08:00"
+ENV REFRESHED_AT "2018-04-30 09:07:00"
+
+USER root
+
+ADD ./files/drupal-update.sh /drupal-update.sh
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y --fix-missing --no-install-recommends -q install \
@@ -10,16 +14,19 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update && \
         wget \
         sed && \
     curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer && \
-    composer global require drush/drush:8.* && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir /home/www-data && \
+    chown www-data:www-data /home/www-data;
 
-RUN touch ~/.profile
+USER www-data:www-data
 
 ENV PATH ~/.composer/vendor/bin:$PATH
+ENV HOME /home/www-data
 
-# ensure console_table is installed
-RUN ~/.composer/vendor/bin/drush --debug
+RUN composer --verbose global require drush/drush:8.*
 
-ADD ./files/drupal-update.sh /drupal-update.sh
+USER www-data:www-data
+
+WORKDIR /usr/share/nginx/html
 
 CMD /bin/bash
